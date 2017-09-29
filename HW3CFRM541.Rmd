@@ -1,0 +1,332 @@
+---
+title: "CFRM 541 Homework 3"
+author: "Greg Damico"
+date: "October 28, 2016"
+output: pdf_document
+---
+
+## Problem \#1
+
+```{r}
+library(mpo)
+library(sn)
+library(quantmod)
+library(TTR)
+library(tseries)
+library(nor1mix)
+
+# There seems to be something funny going on here. I'm trying to call
+# "chart.QQPlot.norMix" from the mpo package, but when I ran the code below I would get an
+# error telling me that the compiler could not find the "chart.QQPlot.norMixEM" function.
+# A student on Piazza helpfully pointed out that this other function was in the nor1mix
+# package. Hence the call above to load the nor1mix package. But it still seems to me that
+# what I really want is not the EM version. Why the code below has been being taken to call
+# this other version remains mysterious to me.
+
+retSW4 <- smallcapW["2007-01-31/"]
+tickers <- c("PLXS", "BRY", "CBM", "AIN")
+mydata <- retSW4[, tickers]
+plot.zoo(mydata)
+
+# It does seem as though these returns are fairly non-normal.  The value of the returns
+# seems generally unpredictable.
+
+nrow = 2
+ncol = 2
+par(mfrow = c(nrow, ncol))
+par(pty = "s")
+par(mar = c(3.1, 4.1, 2.1, 1.1))
+n = 4
+for (i in 1:n) {
+  chart.QQPlot(mydata[, i], xlab = "Normal Quantiles", main = c(tickers[i], "Normal
+            QQPlot"), envelope = 0.95, pch = 20, line = c("quartiles"), lwd = 0.5)
+}
+
+# The normal qqplot leaves a lot to be desired here.  There are many outliers outside even
+# the 0.95 (~ 2 sd) envelope.
+
+nrow = 2
+ncol = 2
+par(mfrow = c(nrow, ncol))
+par(pty = "s")
+par(mar = c(3.1, 4.1, 2.1, 1.1))
+n = 4
+for (i in 1:n) {
+  main = c(tickers[i], "NorMix-2 QQPlot")
+  chart.QQPlot.norMix(mydata[, i], xlab = "Two-Component NorMix Quantiles", main = main, 
+                      na.rm = TRUE, envelope = 0.95, pch = ".", ylab = "", line =
+        c("quartiles"), para = list(m = 2), distribution = "mixnormal", lwd = 0.5)
+}
+
+# This normal-mixture plot seems to do much better.  Now most of the values are inside the
+# envelope.
+
+nrow = 2
+ncol = 2
+par(mfrow = c(nrow, ncol))
+par(pty = "s")
+par(mar = c(3.1, 4.1, 2.1, 1.1))
+n = 4
+for (i in 1:n) {
+  main = c(tickers[i], "NorMix-3 QQPlot")
+  chart.QQPlot.norMix(mydata[, i], xlab = "Three-Component NorMix Quantiles", main = main, 
+                      na.rm = TRUE, envelope = 0.95, pch = ".", ylab = "", line =
+        c("quartiles"), para = list(m = 3), distribution = "mixnormal", lwd = 0.5)
+}
+
+# I don't see a tremendous improvement here.
+
+```
+
+
+## Problem \#2
+
+Consider a fully-invested portfolio with single period return $r_P = w_1r_1 + w_2r_2$ where returns $r_1$, $r_2$ have means $\mu_1$, $\mu_2$, volatilities $\sigma_1$, $\sigma_2$, and correlation coefficient $\rho$. Let $\mu_P$ and $\sigma_P$ be the portfolio mean return and volatility.
+
+
+a. For the case $\rho = 1$ derive the straight-line relationship between $\mu_P$ and $\sigma_P$.
+
+Now:
+\begin{align}
+\mu_P &= E[r_P] \\
+&= E[w_1r_1 + w_2r_2] \\
+&= E[w_1r_1] + E[w_2r_2] \\
+&= w_1\mu_1 + w_2\mu_2.
+\end{align}
+
+Also:
+\begin{align}
+\sigma^2_P &= E[(r_P - \mu_P)^2] \\
+&= E[(w_1(r_1 - \mu_1) + w_2(r_2 - \mu_2))^2] \\
+&= w^T\Sigma w \\
+\end{align}
+
+for
+
+$$
+\Sigma =
+\left[
+\begin{matrix}
+\sigma^2_1 \quad \rho\sigma_1\sigma_2 \\
+\rho\sigma_1\sigma_2 \quad \sigma^2_2 \\
+\end{matrix}
+\right]
+$$
+
+Thus $\sigma^2_P = w^2_1\sigma^2_1 + 2w_1w_2\rho\sigma_1\sigma_2 + w^2_2\sigma^2_2$.
+
+Since the portfolio is fully invested, we know that $w_1 + w_2 = 1$.
+
+For $\rho = 1$, $\sigma^2_P = (w_1\sigma_1 + w_2\sigma_2)^2$.
+
+Thus $\mu_P = w_1\mu_1 + w_2\mu_2 = w_1\mu_1 + (1 - w_1)\mu_2$ and $\sigma_P = w_1\sigma_1 + w_2\sigma_2 = w_1\sigma_1 + (1 - w_1)\sigma_2$.
+
+Solving for $w_1$ from the $\sigma$- equation, we have:
+
+\begin{align}
+w_1(\sigma_1 - \sigma_2) &= \sigma_P - \sigma_2 \\
+w_1 &= \frac{\sigma_P - \sigma_2}{\sigma_1 - \sigma_2}.
+\end{align}
+
+Plugging this into the $\mu$- equation, we have:
+
+\begin{align}
+\mu_P &= \frac{\sigma_P - \sigma_2}{\sigma_1 - \sigma_2}\mu_1 + \frac{\sigma_1 - \sigma_2 - \sigma_P + \sigma_2}{\sigma_1 - \sigma_2}\mu_2 \\
+&= \frac{\mu_1 - \mu_2}{\sigma_1 - \sigma_2}\sigma_P + \frac{\mu_2\sigma_1 - \mu_1\sigma_2}{\sigma_1 - \sigma_2}.
+\end{align}
+
+Thus there is a linear relationship between $\mu_P$ and $\sigma_P$.
+
+
+b. For the case $\rho = -1$ derive the two straight-line relationships between $\mu_P$ and $\sigma_P$.
+
+For $\rho = -1$, $\sigma^2_P = (w_1\sigma_1 - w_2\sigma_2)^2$.
+
+Thus:
+
+$$
+\sigma_P = \left\{
+\begin{array}{ll}
+w_1\sigma_1 - w_2\sigma_2, \quad w_1\sigma_1 \geq w_2\sigma_2 \\
+w_2\sigma_2 - w_1\sigma_1, \quad w_1\sigma_1 < w_2\sigma_2 \\
+\end{array}
+\right.
+$$
+
+Suppose $w_1\sigma_1 \geq w_2\sigma_2$. Then $\sigma_P = w_1\sigma_1 - (1 - w_1)\sigma_2$.
+
+Hence:
+
+\begin{align}
+w_1(\sigma_1 + \sigma_2) &= \sigma_P + \sigma_2 \\
+w_1 &= \frac{\sigma_P + \sigma_2}{\sigma_1 + \sigma_2}.
+\end{align}
+
+Thus:
+
+\begin{align}
+\mu_P &= \frac{\sigma_P + \sigma_2}{\sigma_1 + \sigma_2}\mu_1 + \frac{\sigma_1 + \sigma_2 - \sigma_P - \sigma_2}{\sigma_1 + \sigma_2}\mu_2 \\
+&= \frac{\mu_1 + \mu_2}{\sigma_1 + \sigma_2}\sigma_P + \frac{\mu_2\sigma_1 + \mu_1\sigma_2}{\sigma_1 + \sigma_2}.
+\end{align}
+
+Otherwise: $\sigma_P = -w_1\sigma_1 + (1 - w_1)\sigma_2$.
+
+Hence:
+
+\begin{align}
+w_1(\sigma_1 + \sigma_2) &= -\sigma_P + \sigma_2 \\
+w_1 &= \frac{\sigma_2 - \sigma_P}{\sigma_1 + \sigma_2}.
+\end{align}
+
+Thus:
+
+\begin{align}
+\mu_P &= \frac{\sigma_2 - \sigma_P}{\sigma_1 + \sigma_2}\mu_1 + \frac{\sigma_1 + \sigma_2 - \sigma_2 + \sigma_P}{\sigma_1 + \sigma_2}\mu_2 \\
+&= \frac{\mu_2 - \mu_1}{\sigma_1 + \sigma_2}\sigma_P + \frac{\mu_2\sigma_1 + \mu_1\sigma_2}{\sigma_1 + \sigma_2}.
+\end{align}
+
+Thus there is a linear relationship between $\mu_P$ and $\sigma_P$, since:
+
+$$\mu_P = \left\{
+\begin{array}{ll}
+\frac{\mu_1 + \mu_2}{\sigma_1 + \sigma_2}\sigma_P + \frac{\mu_2\sigma_1 + \mu_1\sigma_2}{\sigma_1 + \sigma_2}, \quad w_1\sigma_1 \geq w_2\sigma_2 \\
+\frac{\mu_2 - \mu_1}{\sigma_1 + \sigma_2}\sigma_P + \frac{\mu_2\sigma_1 + \mu_1\sigma_2}{\sigma_1 + \sigma_2}, \quad w_1\sigma_1 < w_2\sigma_2 \\
+\end{array}
+\right.
+$$
+
+
+## Probem \#3
+
+Consider the quadratic utility optimal weights $\bf{w = \lambda^{-1}\Sigma^{-1}\mu}$ for the case of two assets with returns means, variances, and correlation $\mu_1$, $\mu_2$, $\sigma^2_1$, $\sigma^2_2$, and $\rho$ respectively. First derive the expression for the two-by-two inverse covariance matrix $\Sigma^{-1}$ in terms of $\mu_1$, $\mu_2$, $\sigma^2_1$, $\sigma^2_2$, and $\rho$. Then derive the expression for the derivative of $w_1$ with respect to $\mu_1$ and explain how small changes in $\mu_1$ affect $w_1$ when $\rho$ is close to 1. Also derive an expression for the derivative of $w_2$ with respect to $\mu_1$ and explain how changes in $\mu_1$ affect changes in $w_2$.
+
+Now:
+
+$$
+\Sigma =
+\left[
+\begin{matrix}
+\sigma^2_1 \quad \rho\sigma_1\sigma_2 \\
+\rho\sigma_1\sigma_2 \quad \sigma^2_2 \\
+\end{matrix}
+\right]
+$$
+
+Thus:
+
+\begin{align}
+\Sigma^{-1} &= \frac{1}{\sigma^2_1\sigma^2_2 - \rho\sigma^2_1\sigma^2_2}
+\left[
+\begin{matrix}
+\sigma^2_2 \quad -\rho\sigma_1\sigma_2 \\
+-\rho\sigma_1\sigma_2 \quad \sigma^2_1
+\end{matrix}
+\right] \\
+&=
+\left[
+\begin{matrix}
+\frac{1}{\sigma^2_1(1 - \rho^2)} \quad \frac{-\rho}{\sigma_1\sigma_2(1 - \rho^2)} \\
+\frac{-\rho}{\sigma_1\sigma_2(1 - \rho^2)} \quad \frac{1}{\sigma^2_2(1 - \rho^2)}
+\end{matrix}
+\right]
+\end{align}
+
+For quadratic utility, we have:
+
+$U_q = w^T\mu - \frac{1}{2}\lambda w^T\Sigma w$. Hence $\mu - \lambda\Sigma w = 0$ and $w = \lambda^{-1}\Sigma^{-1}\mu$.
+
+Thus:
+
+\begin{align}
+\left[
+\begin{matrix}
+w_1 \\
+w_2
+\end{matrix}
+\right] &= \lambda^{-1}
+\left[
+\begin{matrix}
+\frac{1}{\sigma^2_1(1 - \rho^2)} \quad \frac{-\rho}{\sigma_1\sigma_2(1 - \rho^2)} \\
+\frac{-\rho}{\sigma_1\sigma_2(1 - \rho^2)} \quad \frac{1}{\sigma^2_2(1 - \rho^2)}
+\end{matrix}
+\right]
+\left[
+\begin{matrix}
+\mu_1 \\
+\mu_2
+\end{matrix}
+\right] \\
+w_1 &= \frac{\mu_1}{\lambda\sigma^2_1(1 - \rho^2)} - \frac{\mu_2\rho}{\lambda\sigma_1\sigma_2(1 - \rho^2)}.
+\end{align}
+
+Thus:
+
+$\frac{\partial w_1}{\partial \mu_1} = \frac{1}{\lambda\sigma^2_1(1 - \rho^2)}$.
+
+Thus when $\rho \approx 1$, i.e. for a highly correlated pair of assets, $\frac{\partial w_1}{\partial \mu_1}$ is huge and so $w_1$ is incredibly sensitive to small changes in $\mu_1$.
+
+Similarly:
+
+$w_2 = \frac{-\rho\mu_1}{\lambda\sigma_1\sigma_2(1 - \rho^2)} + \frac{\mu_2}{\lambda\sigma^2_2(1 - \rho^2)}$,
+
+and so $\frac{\partial w_2}{\partial \mu_1} = \frac{-\rho}{\lambda\sigma_1\sigma_2(1 - \rho^2)}$.
+
+Again, when $\rho \approx 1$, $|\frac{\partial w_2}{\partial \mu_1}|$ is huge and so $w_2$ is incredibly sensitive to small changes in $\mu_1$.  In this case the differential is negative.
+
+
+## Problem \#4
+
+Show that the covariance of a global minimum variance (GMV) portfolio with that of any other frontier portfolio is constant, i.e. does not depend on any portfolio mean returns.
+
+To express the covariance of a GMV portfolio with any other, we write:
+
+\begin{align}
+cov(r_{GMV}, r_P) &= E[(r_{GMV} - \mu_{GMV})(r_P - \mu_P)] \\
+&= E[w^T_{GMV}(r - \mu)^2w_P] \\
+&= w^T_{GMV}\Sigma w_P.
+\end{align}
+
+Now:
+
+\begin{align}
+w^T_{GMV} &= \frac{1}{1^T\Sigma^{-1}1}1^T(\Sigma^{-1})^T \\
+&= \frac{1}{1^T\Sigma^{-1}1}1^T\Sigma^{-1}.
+\end{align}
+
+Thus:
+
+\begin{align}
+cov(r_{GMV}, r_P) &= \frac{1^T\Sigma^{-1}\Sigma w_P}{1^T\Sigma^{-1}1} \\
+&= \frac{1^Tw_P}{1^T\Sigma^{-1}1}.
+\end{align}
+
+Thus the covariance is independent of $\mu_P$.
+
+
+## Problem \#5
+
+Complete the steps to derive the expression (3.77) for the QU optimal portfolio weights $w_{QU}$ with risky assets only.
+
+Expression (3.77) tells us that $w_q = w_{GMV} + \gamma^{-1}_{RA}\Sigma^{-1}(\mu - \mu_{GMV}\cdot 1)$.  Let us start with an expression for quadratic utility.
+
+$U_q = w^T\mu - \frac{1}{2}\gamma_{RA}w^T\Sigma w + \lambda(1 - w^T1)$.
+
+Thus, taking derivatives, $\mu - \gamma_{RA}\Sigma w - \lambda\cdot 1 = 0$.
+
+So $w = \gamma^{-1}_{RA}\Sigma^{-1}(\mu - \lambda\cdot 1)$.
+
+But now $1^Tw = 1$, so $1 = \gamma^{-1}_{RA}1^T\Sigma^{-1}(\mu - \lambda\cdot 1)$.
+
+Thus $\lambda = -\frac{1 - \gamma^{-1}_{RA}1^T\Sigma^{-1}\mu}{\gamma^{-1}_{RA} 1^T\Sigma^{-1}1} = \frac{\gamma^{-1}_{RA}1^T\Sigma^{-1}\mu - 1}{\gamma^{-1}_{RA} 1^T\Sigma^{-1}1}$.
+
+Plugging this equation for $\lambda$ into the above expression for $w$, we have:
+
+\begin{align}
+w &= \gamma^{-1}_{RA}\Sigma^{-1}(\mu - \frac{\gamma^{-1}_{RA}1^T\Sigma^{-1}\mu - 1}{\gamma^{-1}_{RA}1^T\Sigma^{-1}1}\cdot 1) \\
+&= \frac{1}{\gamma}\Sigma^{-1}(\mu - \frac{1^T\Sigma^{-1}\mu - \gamma}{1^T\Sigma^{-1}1}\cdot 1) \\
+&= \frac{1}{\gamma}\Sigma^{-1}(\mu - \frac{1^T\Sigma^{-1}\mu}{1^T\Sigma^{-1}1}\cdot 1 + \frac{\gamma}{1^T\Sigma^{-1}1}\cdot 1) \\
+&= \frac{1}{\gamma}\Sigma^{-1}(\mu - \mu_{GMV}\cdot 1) + \frac{\gamma\Sigma^{-1}}{\gamma 1^T\Sigma^{-1}1}\cdot 1 \\
+&= w_{GMV} + \frac{1}{\gamma}\Sigma^{-1}(\mu - \mu_{GMV}\cdot 1).
+\end{align}
+
+

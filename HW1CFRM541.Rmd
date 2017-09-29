@@ -1,0 +1,141 @@
+---
+title: "CFRM 541 Homework 1"
+author: "Greg Damico"
+date: "October 12, 2016"
+output: pdf_document
+---
+
+## Problem \#1:  Martin \#1
+
+Do the following:
+
+a. Show that for positive values of monthly mean return not greater than $\mu = .01$, the approximation $T * \mu$ given by (1.21) under-estimates the exact result of equation (1.20) by less than 1 percent.
+
+The approximation (1.21) says that $\mu_{0,T} = T * \mu$.
+
+The exact equation (1.20) says that $\mu_{0,T} = (\mu + 1)^{T} - 1$.
+
+First, the numerical argument using R code:
+
+```{r}
+mu <- seq(0.01, 0.0001, by = -0.0001)
+T <- 12
+y1 <- T * mu
+y2 <- (mu + 1)^T - 1
+df <- data.frame(mu, y1, y2)
+library(ggplot2)
+ggplot(df, aes(x = mu)) + geom_line(aes(y = y1), col = "red") +
+  geom_line(aes(y = y2), col = "black")
+ggplot(df, aes(x = mu)) + geom_line(aes(y = y2-y1))
+```
+
+For the analytic solution:
+
+If we set $\mu = 0.01$, (1.20) tells us that $\mu_{0,T} = 1.01^{T} - 1$, whereas (1.21) tells us that $\mu_{0,T} = \frac{T}{100}$.  The difference between them, i.e. $(1.01^{T} - 1) - (\frac{T}{100}) = 0.00683$ for T = 12.  Note that the difference = 0 for T = 1.
+
+Moreover, since $\frac{\partial}{\partial \mu}\left((\mu + 1)^{T} - 1 - T\mu\right) = T(\mu + 1)^{T - 1} - T > 0$ for any positive $\mu$, it is clear that the difference between the exact solution and the approximation will decrease for decreasing $\mu$.
+
+We note here also that, for sufficiently large T, the difference between (1.20) and (1.21) can grow quite large, even for $\mu \leq 0.01$.  For example, for T = 1000 we have:
+\begin{align}
+&T\mu = (1000)(0.01) = 10 \\
+&1.01^T - 1 = 1.01^{1000} - 1 = 20958.16.
+\end{align}
+
+b. Show that for a windfall constant monthly mean return of 2% the exact formula gives 26.8% for annual mean return, whereas the approximate gives 24%, an underestimate of nearly 3%.
+
+We set $T = 12$, since we are considering the compounding of a monthly mean return into an annual return.
+
+Thus we have:
+
+$1.02^{12} - 1 = 0.268$, and $12 * 0.02 = 0.24$.
+
+
+## Problem \#2:  Martin \#2
+
+Derive the expression (1.22) for the variance of multi-period arithmetic returns under the assumption that the returns are independent with constant mean $\mu$ and constant variance $\sigma^{2}$.
+
+(1.22) gives us an expression for the variance of a multi-period (arithmetic) return.
+
+We have:
+\begin{align}
+\sigma_T^2 &= E[(r_{0,T} - E[r_{0,T}])^2] \\
+&= E[(r_{0,T} - ((1 + \mu)^T - 1))^2] \\
+&= E\left[\left(\prod_{t=1}^T (r_{t-1,t} + 1) - 1 + 1 - (1 + \mu)^T\right)^2\right] \\
+&= E\left[\left(\prod_{t=1}^T (r_{t-1,t} + 1)\right)^2 - 2(1 + \mu)^T\prod_{t=1}^T (r_{t-1,t} + 1) + (1 + \mu)^{2T}\right] \\
+&= E\left[\left(\prod_{t=1}^T (r_{t-1,t} + 1)\right)^2\right] - 2(1 + \mu)^{2T} + (1 + \mu)^{2T} \\
+&= E\left[\left(\prod_{t=1}^T (r_{t-1,t} + 1)\right)^2\right] - (1 + \mu)^{2T} \\
+&= E[(r_{0,1} + 1)^2] * ... * E[(r_{T-1,T} + 1)^2] - (1 + \mu)^{2T} \\
+&= E[r_{0,1}^2 + 2r_{0,1} + 1] * ... * E[r_{T-1,T}^2 + 2r_{T-1,T} + 1] - (1 + \mu)^{2T} \\
+&= (E[r_{0,1}^2] - \mu^2 + \mu^2 + 2\mu + 1) * ... * (E[r_{T-1,T}^2] - \mu^2 + \mu^2 + 2\mu + 1) - (1 + \mu)^{2T} \\
+&= (\sigma^2 + (1 + \mu)^2) * ... * (\sigma^2 + (1 + \mu)^2) - (1 + \mu)^{2T} \\
+&= ((1 + \mu)^2 + \sigma^2)^T - (1 + \mu)^{2T}
+\end{align}
+
+
+## Problem \#3:  Martin \#3
+
+Use the fact that the log is a concave function to prove the inequality (1.47).
+
+(1.47) says that $\hat{\mu}_{g,T} \leq \hat{\mu}_{a,T}$ for $T > 1$.
+
+We prove it as follows:
+
+Start with (1.46):
+
+$\mu_{g,T} = (\prod_{t=1}^{T} (r_t + 1))^{1/T} - 1$.
+
+Take the (natural) log of both sides:
+
+$\log(\mu_{g,T}) = \log((\prod_{t=1}^{T} (r_t + 1))^{1/T} - 1)$
+
+Now $\log((\prod_{t=1}^{T} (r_t + 1))^{1/T} - 1) < \log((\prod_{t=1}^{T} (r_t + 1))^{1/T}) = \frac{1}{T} \log(\prod_{t=1}^{T} (r_t + 1)) = \frac{1}{T} \sum_{t=1}^{T} \log(r_t + 1)$.
+
+The hint tells us that, since $\log(x)$ is concave, $\sum_{t=1}^{T} \log(r_t + 1) \leq \log(\sum_{t=1}^{T} (r_t + 1))$.
+
+Hence
+\begin{align}
+\log(\mu_{g,T}) &= \log((\prod_{t=1}^{T} (r_t + 1))^{1/T} - 1) \\
+&< \log((\prod_{t=1}^{T} (r_t + 1))^{1/T}) \\ 
+&= \frac{1}{T} \log(\prod_{t=1}^{T} (r_t + 1)) \\
+&= \frac{1}{T} \sum_{t=1}^{T} \log(r_t + 1) \\
+&\leq \frac{1}{T} \log(\sum_{t=1}^{T} (r_t + 1)) \\
+&= \log(\mu_{a,T}).
+\end{align}
+
+Thus $\mu_{g,T} < \mu_{a,T}$ and $\hat{\mu}_{g,T} < \hat{\mu}_{a,T}$.
+
+
+## Problem \#4:  Martin \#5
+
+Show that if f(r) is any probability density function that is symmetric about a location parameter $\mu$ and that has a finite third moment $E[r^{3}]$, and hence finite third central moment $E[(r - \mu)^{3}]$, then the coefficient of skewness is zero.
+
+To say that a probability density function f is symmetric about $\mu$ is to say that for any r, $f(\mu - r) = f(\mu + r)$.
+
+Now $E[(r - \mu)^{3}] = \int_{-\infty}^{\infty}(r - \mu)^{3} f(r) dr$.  Consider wlog any $r_{+}$ such that $(r_{+} - \mu) > 0$.  Then, by symmetry, there is some $r_{-}$ such that $(r_{-} - \mu) = -(r_{+} - \mu)$.  And since our choice of r was generic, it is clear that $\int (r - \mu) dr = 0$.  Hence $\int_{-\infty}^{\infty}(r - \mu)^{3} f(r) dr = 0$ and thus the coefficient of skewness, $\frac{\int (r - \mu)^{3} f(r) dr}{\sigma^{3}}$, is also zero.
+
+
+## Problem \#5:  Martin \#7
+
+Derive the equations (1.57) and (1.58) for the mean and variance of a two-component normal mixture distribution.
+
+(1.57) tells us that $\mu_{nm} = E[r_{nm}] = \pi_{1}\mu_{1} + \pi_{2}\mu_{2}$, where $\pi_{1}$ and $\pi_{2}$ are jointly exhaustive probabilities and $\mu_{1}$ and $\mu_{2}$ are the means of the two normal components.
+
+Now $\mu_{nm} = E[r_{nm}] = \int_{-\infty}^{\infty} r f_{nm}(r) dr = \int_{-\infty}^{\infty} r (\frac{\pi_{1}}{\sigma_{1}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{1}}{\sigma_{1}})^2}{2}} + \frac{\pi_{2}}{\sigma_{2}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{2}}{\sigma_{2}})^2}{2}}) dr$.
+
+But
+\begin{align}
+\int_{-\infty}^{\infty} r (\frac{\pi_{1}}{\sigma_{1}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{1}}{\sigma_{1}})^2}{2}} + \frac{\pi_{2}}{\sigma_{2}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{2}}{\sigma_{2}})^2}{2}}) dr &= \int_{-\infty}^{\infty} r \frac{\pi_{1}}{\sigma_{1}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{1}}{\sigma_{1}})^2}{2}} dr + \int_{-\infty}^{\infty} r \frac{\pi_{2}}{\sigma_{2}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{2}}{\sigma_{2}})^2}{2}} dr \\
+&= \pi_{1} \int_{-\infty}^{\infty} r \frac{1}{\sigma_{1}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{1}}{\sigma_{1}})^2}{2}} dr + \pi_{2} \int_{-\infty}^{\infty} r \frac{1}{\sigma_{2}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{2}}{\sigma_{2}})^2}{2}} dr \\
+&= \pi_{1}\mu_{1} + \pi_{2}\mu_{2}
+\end{align}
+
+(1.58) tells us that $\sigma_{mn}^2 = var(r_{nm}) = \sum_{i=1}^{2} \pi_i(\mu_i - \mu_{nm})^2 + \sum_{i=1}^{2} \pi_i\sigma_{i}^2$.
+
+Now
+\begin{align}
+\sigma_{mn}^2 &= \int_{-\infty}^{\infty} (r - \mu_{nm})^2 (\frac{\pi_{1}}{\sigma_{1}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{1}}{\sigma_{1}})^2}{2}} + \frac{\pi_{2}}{\sigma_{2}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{2}}{\sigma_{2}})^2}{2}}) dr \\
+&= \pi_1 \int_{-\infty}^{\infty} (r - \mu_{nm})^2 \frac{1}{\sigma_{1}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{1}}{\sigma_{1}})^2}{2}} dr + \pi_2 \int_{-\infty}^{\infty} (r - \mu_{nm})^2 \frac{1}{\sigma_{2}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{2}}{\sigma_{2}})^2}{2}} dr \\
+&= \pi_1\left(\int_{-\infty}^{\infty} (r - \mu_1)^2 \frac{1}{\sigma_{1}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{1}}{\sigma_{1}})^2}{2}} dr + (\mu_1 - \mu_{nm})^2\right) + \pi_2\left(\int_{-\infty}^{\infty} (r - \mu_2)^2 \frac{1}{\sigma_{2}\sqrt{2\pi}} e^{\frac{-(\frac{r - \mu_{2}}{\sigma_{2}})^2}{2}} dr + (\mu_2 - \mu_{nm})^2\right) \\
+&= \pi_1(\sigma_1^2 + (\mu_1 - \mu_{nm})^2) + \pi_2(\sigma_2^2 + (\mu_2 - \mu_{nm})^2) \\
+&= \sum_{i=1}^2 \pi_i(\mu_i - \mu_{nm})^2 + \sum_{i=1}^2 \pi_i\sigma_i^2
+\end{align}

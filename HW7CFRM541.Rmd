@@ -1,0 +1,256 @@
+---
+title: "CFRM 541 Homework 7"
+author: "Greg Damico"
+date: "December 3, 2016"
+output: pdf_document
+---
+
+## Problem \#1
+
+a. First install the package "Ecdat" which contains the CRSPmon stock returns for GE, IBM, and Mobil. Then run the code FamaFrenchP1.R. Make sure that you understand what the code is doing.
+
+```{r}
+setwd("~/Downloads/HW7_Exercise1")
+library("Ecdat")
+library(mpo)
+library(factorAnalytics)
+
+# Prepare returns and factor data for use by fitTsfm
+crspMon = as.xts(CRSPmon)
+FF_data = read.table("FamaFrench_mon_69_98.txt",header=T)
+FF_data <- ts(FF_data[,-1],start=c(1969,1),frequency=12)
+ff = as.xts(FF_data)
+range(index(ff))
+factors <- ff[,-4]
+facNames = c("MKTE","SMB","HML")
+names(factors) = facNames
+ge = 100*crspMon[,1] - ff[,"RF"]
+ibm = 100*crspMon[,2] - ff[,"RF"]
+mobil = 100*crspMon[,3] - ff[,"RF"]
+returns = cbind(ge,ibm,mobil)
+retNames = c("GE","IBM","MOBIL")
+names(returns) = retNames
+data = cbind(returns,factors)
+head(data,3)
+pairs(coredata(data),pch=20,col=rgb(0,0,100,50,maxColorValue=255))
+
+# Fit GE,IBM,and MOBIL versus the three Fama-French factors
+fit = fitTsfm(retNames,facNames,data=data)
+fit
+summary(fit)
+# plot(fit,f.sub=facNames,a.sub=retNames,which=c(1,2,4))
+# plot(fit,f.sub=facNames,a.sub=retNames,which=c(6,7,8))
+
+```
+
+
+i. Report the results of the use of "fit".
+
+The market ("MKTE") factor is significant for every asset, but that is not to say that the Fama-French model isn't better than the CAPM model in these cases. The SMB factor is significant for every asset at the 1\% level and for two of the three at the 0.1\% level.
+
+ii. State which of the SMB and HML factors are significant for each of GE,
+IBM and MOBIL.
+
+SMB is significant for GE and MOBIL at the 0.1\% level and for IBM at the 1\% level.
+
+HML is not significant for GE, but significant for IBM at the 5\% level and for MOBIL at the 1\% level.
+
+iii. Explain why the signs of the estimated coefficients (factor loadings) are
+quite reasonable for SMB.
+
+The coefficient for all three assets is < 0, which is to say that the investment in small-caps is less than the investment in large-. This is hardly surprising since all three of these assets are large-cap companies.
+
+b. Run the code FamaFrenchP2.R. Make sure you understand what the code is doing.
+
+```{r}
+setwd("~/Downloads/HW7_Exercise1")
+library(mpo)
+library(factorAnalytics)
+ret <- midcap.ts[,1:20]
+index(ret) <- as.yearmon(index(ret))
+head(ret)
+dat <- read.table("ff_1997to2001mon.csv",header=TRUE,sep=",")
+ff <- xts(x=dat[,-1],order.by=as.yearmon(as.character(dat[,1]),
+                          format="%Y%m"))
+factors <- ff[,-4]
+facNames = c("MKTe","SMB","HML")
+names(factors) = facNames
+rete =  100*ret - as.numeric(ff[,"RF"])
+head(rete)
+head(factors)
+retNames = names(ret)
+names(rete) = retNames
+data = merge(rete,factors)
+
+pairs(coredata(rete),pch=20)
+pairs(coredata(factors),pch=16)
+
+# Fit ten stocks versus the three Fama-French factors
+fit = fitTsfm(retNames,facNames,data=data)
+fit
+summary(fit)
+# plot(fit,f.sub=facNames,a.sub=retNames,which=c(1,2,4))
+# plot(fit,f.sub=facNames,a.sub=retNames,which=c(6,7,8))
+
+```
+
+
+i. Report the results of the use of "fit".
+
+See the results of 'summary(fit)' above.
+
+ii. For how many of the 20 midcap stocks is SMB a statistically significant
+factor with a p value of .05 or less?
+
+For none of them!
+
+iii. Which of the 20 midcap stocks are clearly value stocks?
+
+Twelve of the assets' stocks are clearly value stocks: EMN, LEG, UTR, BNK, LNCR, DBD, FAST, AF, EC, SNV, HSY, and TXT all have significantly positive high-minus-low coefficients. The coefficients of MAT, HB, APA, and BMET are also positive, but they are either not statistically significant (BMET) or significant only at the 10\% level (MAT, HB, APA).
+
+iv. Which of the 20 midcap stocks are potentially growth stocks (but not
+significantly so from a statistical point of view)?
+
+AAPL, CPWR, APCC, and LXK all have negative HML coefficients, hence may well be growth stocks (though these values are not statistically significant).
+
+## Problem \#2
+
+Firm Characteristics.
+
+a. The code "corr for AA ret vs E2P.R" plots the E2P exposure versus the returns, and computes the classical correlation estimate between the returns at time t and the E2P exposure at time t-1. Run the code and report the value of the correlation estimate. The code also computes a robust correlation estimate using a rank-based estimator called Spearman’s rho. Based on the scatter-plot of the data, which of the two correlation estimates (classical and robust) better describes the bulk of the data?
+
+```{r}
+setwd("~/Downloads/HW7_Exercise2")
+dat.monthly <- read.table("MonthlyFactorDataSet.csv",
+                          sep=",",header=TRUE,as.is=TRUE)
+
+aa = dat.monthly[dat.monthly[,"TICKER"]=="AA",]
+head(aa)
+ret = aa[,"RET"]
+factor = aa[,"E2P"]
+n = length(ret)
+x = ret[2:n]
+y = factor[1:(n-1)]
+cor(x,y)
+plot(x,y)  # Note the outliers
+
+# Spearman's "rho" computes a robust correlation by
+# using the ranks of x and y
+cor(x,y,method = "spearman")
+# The resulting more negative rho makes sense in view of the outliers
+
+```
+
+The standard correlation is estimated at -0.0917 and the Spearman correlation is estimated at 0.0214.
+
+There are some significant outliers with low (even negative) E2P scores, and these seem to be responsible for the negative value of the standard $\rho$. But the robust Spearman $\rho$ correctly downgrades the significance of these outliers and in fact makes a positive estimate of the correlation, which does indeed seem to fit the scatterplot better (at least, a line with positive slope seems to fit the bulk of the data (i.e. the unsurprising data) better). So I would say that the robust measure is superior in this case.
+
+b. The code "corrs29RetVsFactorsDjia.R" computes the correlations between returns at time t and the E2P exposure at time t-1 for each of 29 stocks in the DJIA data set, and plots a histogram of the 29 t-statistics. See the comments in the code file and answer the following question. For how many of the 29 stocks is the null hypothesis of zero correlation rejected and what is the sign of those correlations? Run the code for exposures for each of P2B and SIZE and answer the same question above in each case.
+
+E2P factor:
+
+```{r}
+setwd("~/Downloads/HW7_Exercise2")
+dat.monthly <- read.table("MonthlyFactorDataSet.csv",
+                          sep=",",header=TRUE,as.is=TRUE)
+names(dat.monthly)
+facChoice = "E2P"
+tckUnique = unique(dat.monthly[,"TICKER"])
+
+for(tck in tckUnique)
+  {dat = dat.monthly[dat.monthly[,"TICKER"]==tck,]
+  ret = dat[,"RET"]
+  fac = dat[,facChoice]
+  n = length(ret)
+  x = ret[2:n]
+  y = fac[1:(n-1)]
+  if(tck=="AA") {allcorr = cor(x,y)} else
+  {allcorr = c(allcorr,cor(x,y))}
+  }
+allcorr
+# hist(allcorr)
+
+# Under the null hypothesis that the correlation is zero
+# the t-statistic is the correlation estimate divided by 
+# the standard error (S.E.) of the estimator.  For small
+# correlations the S.E. is 1/sqrt(n) to a good approximation
+# So the following is the histogram of the t-statistics for
+# the 29 correlations of returns versus E2P on time perio 
+# earlier.  The two-sided level 5% t-test of zero correlation
+# reject when the absolute value fo the t-statistic is greater
+# the 1.96 (using a normal distribution, which is quite accurate
+# for the large sample size here)
+# 
+# We shall here calculate t-scores for the correlation estimates; a value of
+# 1.96 or higher will tell us that the null hypothesis is to be rejected in
+# that case. We shall do the same below for the P2B and the SIZE factors.
+
+sqrt(n)*allcorr
+
+# hist(sqrt(n)*allcorr)
+
+```
+
+We reject the null hypothesis of zero correlation in the cases of stock ## 4, 5, 8, 10, 15, 16, 17, 18, 20, 22, and 28, i.e. for 11 of the 29 stocks. All of these have positive correlations.
+
+P2B factor:
+
+```{r}
+setwd("~/Downloads/HW7_Exercise2")
+dat.monthly <- read.table("MonthlyFactorDataSet.csv",
+                          sep=",",header=TRUE,as.is=TRUE)
+names(dat.monthly)
+facChoice = "P2B"
+tckUnique = unique(dat.monthly[,"TICKER"])
+
+for(tck in tckUnique)
+  {dat = dat.monthly[dat.monthly[,"TICKER"]==tck,]
+  ret = dat[,"RET"]
+  fac = dat[,facChoice]
+  n = length(ret)
+  x = ret[2:n]
+  y = fac[1:(n-1)]
+  if(tck=="AA") {allcorr = cor(x,y)} else
+  {allcorr = c(allcorr,cor(x,y))}
+  }
+allcorr
+# hist(allcorr)
+
+sqrt(n)*allcorr
+
+# hist(sqrt(n)*allcorr)
+
+```
+
+We reject the null hypothesis of zero correlation in the cases of stock ## 5, 6, 8, 10, 12, 13, 14, 25, 27, and 28, i.e. for 10 of the 29 stocks. All of these have negative correlations.
+
+SIZE factor:
+
+```{r}
+setwd("~/Downloads/HW7_Exercise2")
+dat.monthly <- read.table("MonthlyFactorDataSet.csv",
+                          sep=",",header=TRUE,as.is=TRUE)
+names(dat.monthly)
+facChoice = "SIZE"
+tckUnique = unique(dat.monthly[,"TICKER"])
+
+for(tck in tckUnique)
+  {dat = dat.monthly[dat.monthly[,"TICKER"]==tck,]
+  ret = dat[,"RET"]
+  fac = dat[,facChoice]
+  n = length(ret)
+  x = ret[2:n]
+  y = fac[1:(n-1)]
+  if(tck=="AA") {allcorr = cor(x,y)} else
+  {allcorr = c(allcorr,cor(x,y))}
+  }
+allcorr
+# hist(allcorr)
+
+sqrt(n)*allcorr
+
+# hist(sqrt(n)*allcorr)
+
+```
+
+We reject the null hypothesis of zero correlation in the cases of stock ## 9, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 24, 26, 27, and 28, i.e. for 15 of the 29 stocks. All of these have negative correlations.

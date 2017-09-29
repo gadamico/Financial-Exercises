@@ -1,0 +1,219 @@
+---
+title: "CFRM 541 Homework 4"
+author: "Greg Damico"
+date: "November 11, 2016"
+output: pdf_document
+---
+
+## Problem \#1
+
+You are a financial advisor for a client whose portfolio consists of a weighted combination of a T-Bill at $r_f = 5\%$ and a portfolio P of risky assets with $\mu_P = 11\%$ and $\sigma_P = 15\%$.
+
+a. Your client wants to invest a portion of her total investment budget in the risky portfolio and the remainder in a T-bill so as to obtain an expected rate of return on the overall portfolio of 8\%. What proportion of her investment budget will you tell her to allocate to the risky portfolio and what proportion to the T-bill?
+
+The expected return on the whole portfolio (P + T-bill) is $(1 - w_1)r_f + w_1\mu_P$. Thus we set this equal to 0.08 and solve for $w_1$:
+
+\begin{align}
+(1 - w_1)r_f + w_1\mu_P &= 0.08 \\
+w_1 &= \frac{0.08 - r_f}{\mu_P - r_f} \\
+&= \frac{0.08 - 0.05}{0.11 - 0.05} \\
+&= \frac{0.03}{0.06} \\
+&= 0.5.
+\end{align}
+
+Thus we advise our client to invest half of her budget in the T-bill and half in the risky portfolio P.
+
+b. What will be the volatility (standard deviation) of her portfolio?
+
+The variance on the entire portfolio is $w^2_1\sigma^2_P = (0.5)^2(0.15)^2 = (0.25)(0.0225) = 0.005625$. Thus the volatility is $\sqrt{0.005625} = 0.075 = 7.5\%$.
+
+c. Later your client changes her mind and tells you that she wants an overall portfolio that
+delivers the highest expected return subject to a constraint of no more than $12\%$ volatility. What will you tell her that the resulting highest expected return will be?
+
+If the volatility is 12\%, then we have $\sqrt{w^2_1\sigma^2_P} = 0.12$. Thus
+
+\begin{align}
+w_1 &= \sqrt{\frac{(0.12)^2}{\sigma^2_P}} \\
+&= \sqrt{\frac{0.12)^2}{(0.15)^2}} \\
+&= \frac{0.12}{0.15} \\
+&= 0.8.
+\end{align}
+
+The expected return for such a portfolio is $(1 - 0.8)(0.05) + (0.8)(0.11) = 0.098 = 9.8\%$.
+
+## Problem \#2
+
+Assume that the expected annual rate of return on the market portfolio is 23\% and the annual volatility of the market return is 32\%. Assume that the annual rate of return on T-bills is 7\%.
+
+a. What is the equation of the capital market line?
+
+The equation for the capital market line is $\mu_P = r_f + \frac{\mu_A - r_f}{\sigma_M}\sigma_P$. And $r_f$ will be the return on a T-bill. So we have:
+
+\begin{align}
+\mu_P &= r_f + \frac{\mu_A - r_f}{\sigma_M}\sigma_P \\
+&= 0.07 + \frac{0.23 - 0.07}{0.32}\sigma_P \\
+&= 0.07 + \frac{\sigma_P}{2}.
+\end{align}
+
+b. (i) If an expected return of 39\% is desired, what is the standard deviation of this position?
+
+From (a) we have that $\sigma_P = 2(\mu_P - 0.07)$. Thus if $\mu_P = 0.39$, then $\sigma_P = 2(0.39 - 0.07) = 0.64 = 64\%$.
+
+(ii) If you have $1,000 to invest, how will you allocate it to achieve the above position?
+
+Since $\sigma^2_P = w^2_1\sigma^2_M$, we know that $w_1 = \sqrt{\frac{\sigma^2_P}{\sigma^2_M}} = \frac{\sigma_P}{\sigma_M} = \frac{0.64}{0.32} = 2$.
+
+Thus one would need to invest all $1000 and then another $1000 on top of that, which one borrows at the risk-free rate. So one would have to adopt a short position in order to achieve such a high-risk/high-reward position.
+
+c. If you invest $300 in the risk-free asset and $700 in the market portfolio, how much
+money should you expect to have at the end of one year?
+
+Our expected return is (0.3)(0.07) + (0.7)(0.16) = 0.021 + 0.122 = 0.133. Thus we should expect to have $133 on top of our original investment of $1000, for a total of $1133.
+
+## Problem \#3
+
+The expression $d = (1^T\Sigma^{-1}1)(\mu^T\Sigma^{-1}\mu) - (1^T\Sigma^{-1}\mu)^2$ was defined in equation (3.69) of _QAM_ CH3, where it is claimed that d is positive. Show that this is indeed true except for a special case that can be ignored.
+
+Since $\Sigma$ is positive definite, let us define $a = \Sigma^{-\frac{1}{2}}\mu$ and $b = \Sigma^{-\frac{1}{2}}1$, noting that $a^T = \mu^T\Sigma^{-\frac{1}{2}}$ and that $b^T = 1^T\Sigma^{-\frac{1}{2}}$. Then we can write $d = (1^T\Sigma^{-1}1)(\mu^T\Sigma^{-1}\mu) - (1^T\Sigma^{-1}\mu)^2 = (1^T\Sigma^{-\frac{1}{2}}\Sigma^{-\frac{1}{2}}1)(\mu^T\Sigma^{-\frac{1}{2}}\Sigma^{-\frac{1}{2}}\mu) - (1^T\Sigma^{-\frac{1}{2}}\Sigma^{-\frac{1}{2}}\mu)^2 = (b^Tb)(a^Ta) - (b^Ta)^2$.
+
+But now by the Cauchy-Schwarz Inequality, we know that $(b^Tb)(a^Ta) \geq (b^Ta)^2$ and that these scalars are equal only in the event that $a$ is a multiple of $b$ (or _vice versa_). Thus $d > 0$ unless the $\mu$ vector is a multiple of the unit vector, a negligible possibility.
+
+## Problem \#4
+
+Consider the QU Benchmark Relative Optimization problem of Section 3.9 of CH3 _QAM_, and do the following.
+
+a. Show that the Lagrange multiplier is indeed given by equation (3.104).
+
+(3.104) tells us that the Lagrange multiplier for the QU Benchmark problem is (I here use '$\lambda_{opt}$' instead of '$l_{opt}$' and '$\gamma$' instead of '$\lambda$'):
+
+$\lambda_{opt} = \frac{1^T\Sigma^{-1}\mu}{1^T\Sigma^{-1}1}$.
+
+We derive it as follows.
+
+We start with the optimization problem. The Lagrangian is:
+
+$L(w) = w^T\mu - \frac{1}{2}\gamma w^T\Sigma w - \lambda_{opt}w^T1$.
+
+Thus we set $L'(w) = \mu - \gamma\Sigma w - \lambda_{opt} \cdot 1$ to 0.
+
+So, solving for $w$, we have $w = \gamma^{-1}\Sigma^{-1}(\mu - \lambda_{opt} \cdot 1)$.
+
+Plugging this in to the constraint we have:
+
+$\gamma^{-1}(\mu - \lambda_{opt} \cdot 1)^T\Sigma^{-1}1 = 0$.
+
+Thus:
+
+\begin{align}
+\mu^T\Sigma^{-1}1 &= (\lambda_{opt} \cdot 1)^T\Sigma^{-1}1 \\
+1^T\Sigma^{-1}(\lambda_{opt} \cdot 1) &= 1^T\Sigma^{-1}\mu \\
+\lambda_{opt} &= \frac{1^T\Sigma^{-1}\mu}{1^T\Sigma^{-1}1}.
+\end{align}
+
+b. Confirm that the optimal active weights are dollar-neutral.
+
+We have that:
+
+$w = \gamma^{-1}\Sigma^{-1}(\mu - \lambda_{opt} \cdot 1)$. From part (a), we can write:
+
+$w = \gamma^{-1}\Sigma^{-1}(\mu - \frac{1^T\Sigma^{-1}\mu}{1^T\Sigma^{-1}1} \cdot 1)$.
+
+Thus:
+
+\begin{align}
+1^Tw &= 1^T\gamma^{-1}\Sigma^{-1}(\mu - \frac{1^T\Sigma^{-1}\mu}{1^T\Sigma^{-1}1} \cdot 1) \\
+&= \gamma^{-1}\left[1^T\Sigma^{-1}\mu - \frac{1^T\Sigma^{-1}(1^T\Sigma^{-1}\mu \cdot 1)}{1^T\Sigma^{-1}1}\right] \\
+&= \gamma^{-1}\left[1^T\Sigma^{-1}\mu - \frac{1^T\Sigma^{-1}1}{1^T\Sigma^{-1}1}1^T\Sigma^{-1}\mu\right] \\
+&= \gamma^{-1}(1^T\Sigma^{-1}\mu - 1^T\Sigma^{-1}\mu) \\
+&= 0.
+\end{align}
+
+c. Derive expressions (3.107), (3.108) and (3.110). Is the IR always positive? If so, why?
+
+(3.107) tells us that the optimal active mean return is:
+
+$\mu_{A,opt} = \gamma^{-1}(\mu^T\Sigma^{-1}\mu - \lambda_{opt}1^T\Sigma^{-1}\mu)$.
+
+Now:
+
+\begin{align}
+\mu_{A,opt} = w^T\mu &= \gamma^{-1}(\mu - \lambda_{opt} \cdot 1)^T\Sigma^{-1}\mu \\
+&= \gamma^{-1}(\mu^T\Sigma^{-1}\mu - (\lambda_{opt} \cdot 1))^T\Sigma^{-1}\mu \\
+&= \gamma^{-1}(\mu^T\Sigma^{-1}\mu - \lambda_{opt}1^T\Sigma^{-1}\mu).
+\end{align}
+
+(3.108) tells us that the optimal active volatility is:
+
+$\sigma_{A,opt} = \gamma^{-1}\sqrt{\mu^T\Sigma^{-1}\mu - \lambda_{opt}1^T\Sigma^{-1}\mu}$.
+
+Now:
+
+\begin{align}
+\sigma_{A,opt} = \sqrt{w^T\Sigma w} &= \sqrt{\gamma^{-1}(\mu - \lambda_{opt} \cdot 1)^T\Sigma^{-1}\Sigma\gamma^{-1}\Sigma^{-1}(\mu - \lambda_{opt} \cdot 1)} \\
+&= \sqrt{\gamma^{-2}(\mu - \lambda_{opt} \cdot 1)^T\Sigma^{-1}(\mu - \lambda_{opt} \cdot 1)} \\
+&= \sqrt{\gamma^{-2}\mu^T\Sigma^{-1}\mu - \lambda_{opt}1^T\Sigma^{-1}\mu - \lambda_{opt}\mu^T\Sigma^{-1}1 + \lambda^2_{opt}1^T\Sigma^{-1}1} \\
+&= \gamma^{-1}\sqrt{\mu^T\Sigma^{-1}\mu - 2\lambda_{opt}1^T\Sigma^{-1}\mu + \lambda_{opt}\frac{1^T\Sigma^{-1}\mu}{1^T\Sigma^{-1}1}1^T\Sigma^{-1}1} \\
+&= \gamma^{-1}\sqrt{\mu^T\Sigma^{-1}\mu - 2\lambda_{opt}1^T\Sigma^{-1}\mu + \lambda_{opt}1^T\Sigma^{-1}\mu} \\
+&= \gamma^{-1}\sqrt{\mu^T\Sigma^{-1}\mu - \lambda_{opt}1^T\Sigma^{-1}\mu}.
+\end{align}
+
+(3.110) tells us that the information ratio is:
+
+$IR = \sqrt{\mu^T\Sigma^{-1}\mu - \lambda_{opt}1^T\Sigma^{-1}\mu}$.
+
+This is immediate, since:
+
+$IR = \frac{\mu_{A,opt}}{\sigma_{A,opt}} = \frac{\gamma^{-1}(\mu^T\Sigma^{-1}\mu - \lambda_{opt}1^T\Sigma^{-1}\mu)}{\gamma^{-1}\sqrt{\mu^T\Sigma^{-1}\mu - \lambda_{opt}1^T\Sigma^{-1}\mu}} = \sqrt{\mu^T\Sigma^{-1}\mu - \lambda_{opt}1^T\Sigma^{-1}\mu}$.
+
+The IR is always positive, since $\mu_{A,opt} > 0$ and $\sigma_{A,opt} > 0$.
+
+## Problem \#5
+
+Consider the single-factor benchmark model $r_P = \beta_Pr_B + \epsilon$, where it is assumed that $\beta_P = \frac{cov(r_P,r_B)}{\sigma^2_B}$. Show that, as a consequence, $cov(\epsilon,r_B) = 0$.
+
+We have:
+
+\begin{align}
+cov(\epsilon,r_B) &= cov(r_P - \beta_Pr_B,r_B) \\
+&= cov(r_P,r_B) - cov(\beta_Pr_B,r_B) \\
+&= cov(r_P,r_B) - \beta_P cov(r_B,r_B) \\
+&= cov(r_P,r_B) - \frac{cov(r_P,r_B)}{\sigma^2_B}\sigma^2_B \\
+&= cov(r_P,r_B) - cov(r_P,r_B) \\
+&= 0.
+\end{align}
+
+## Problem \#6
+
+The beta of an asset or portfolio depends on the market proxy benchmark we choose. Suppose you first choose the S&P500 index as the market (proxy) and find that the beta of the Russell 3000 index is .9. Suppose you then chose the Russell 3000 as the market and find that the beta of the S&P500 is .95. Thus the beta of both indexes on the other is less than one. Is this possible, and if so why?
+
+This is not possible. Let $\beta_{R3} = 0.9$ be the beta for the S&P500 and let $\beta_{SP} = 0.95$ be the beta for the Russell 3000. Then we have:
+
+$\mu_{R3} = r_f + \beta_{R3}(\mu_{SP} - r_f)$ and $\mu_{SP} = r_f + \beta_{SP}(\mu_{R3} - r_f)$.
+
+But then $\beta_{R3} = \frac{\mu_{R3} - r_f}{\mu_{SP} - r_f}$ and $\beta_{SP} = \frac{\mu_{SP} - r_f}{\mu{R3} - r_f}$. Thus $\beta_{SP} = \frac{1}{\beta_{R3}}$, and so it cannot be that both betas are less than 1.
+
+## Problem \#7
+
+```{r}
+library(mpo)
+
+## Part (a).
+
+returnslarge = largecap.ts["1997-01-01/2001-12-31", 1:10]
+
+mathEfront(returnslarge, mu.max = 0.05, sigma.max = 0.25, npoints = 100)
+
+mathEfront(largecap.ts, mu.max = 0.05, sigma.max = 0.25, npoints = 100)
+
+## Now Part (b).
+
+returnssmall = smallcap.ts["1997-01-01/2001-12-31", 1:10]
+
+mathEfront(returnssmall, mu.max = 0.1, sigma.max = 0.3, npoints = 100)
+
+mathEfront(smallcap.ts, mu.max = 0.1, sigma.max = 0.3, npoints = 100)
+```
+
+For Part (a), it is clear that, for a given volatility, the expected return on the 20-stock portfolio is greater than that of the 10-stock portfolio. By the same token, for a given expected return, the volatility on the 20-stock portfolio is less than that of the 10-stock portfolio.
+
+For Part (b), we see much greater average volatility in the small-cap stocks than in the large-cap; thus it seems that, during 1997-2001, it was safer to invest in the large-cap businesses.

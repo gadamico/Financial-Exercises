@@ -1,0 +1,144 @@
+---
+title: "CFRM 541 Homework 5"
+author: "Greg Damico"
+date: "November 18, 2016"
+output: pdf_document
+---
+
+## Problem \#1
+
+Show that for an i.i.d. sample with a normal distribution $N(\mu, \sigma^2)$, the sample mean and the sample variance with divisor $n$ are the joint MLE's of the mean and variance.
+
+We set $\theta = (\mu, \sigma^2)$ and write the log-likelihood:
+
+$l(\theta) = l(\mu, \sigma^2) = \log\left(\frac{1}{(2\pi\sigma^2)^{n/2}}\right) - \Sigma^n_{i=1}\frac{(x_i - \mu)^2}{2\sigma^2}$.
+
+To maximize this we set the partials equal to zero:
+
+\begin{align}
+\frac{\partial}{\partial\mu}\left[\log\left(\frac{1}{(2\pi\sigma^2)^{n/2}}\right) - \Sigma^n_{i=1}\frac{(x_i - \mu)^2}{2\sigma^2}\right] &= 0 \\
+\frac{\partial}{\partial\sigma^2}\left[\log\left(\frac{1}{(2\pi\sigma^2)^{n/2}}\right) - \Sigma^n_{i=1}\frac{(x_i - \mu)^2}{2\sigma^2}\right] &= 0.
+\end{align}
+
+Solving the first, we have:
+
+\begin{align}
+\frac{\partial}{\partial\mu}\left[\log\left(\frac{1}{(2\pi\sigma^2)^{n/2}}\right) - \Sigma^n_{i=1}\frac{(x_i - \mu)^2}{2\sigma^2}\right] &= 0 \\
+0 + \frac{2}{2\sigma^2}\Sigma^n_{i=1}(x_i - \mu) &= 0 \\
+\frac{1}{\sigma^2}\left(\Sigma^n_{i=1}x_i - n\mu\right) &= 0 \\
+\mu &= \frac{1}{n}\Sigma^n_{i=1}x_i.
+\end{align}
+
+Solving the second, we have:
+
+\begin{align}
+\frac{\partial}{\partial\sigma^2}\left[\log\left(\frac{1}{(2\pi\sigma^2)^{n/2}}\right) - \Sigma^n_{i=1}\frac{(x_i - \mu)^2}{2\sigma^2}\right] &= 0 \\
+(2\pi\sigma^2)^{n/2}(-\frac{n}{2})(2\pi\sigma^2)^{-\frac{n}{2}-1}(2\pi) + \frac{\Sigma^n_{i=1}(x_i - \mu)^2}{2\sigma^4} &= 0 \\
+-\frac{n}{2\sigma^2} + \frac{\Sigma^n_{i=1}(x_i - \mu)^2}{2\sigma^4} &= 0 \\
+-\frac{n\sigma^2}{2\sigma^4} + \frac{\Sigma^n_{i=1}(x_i - \mu)^2}{2\sigma^4} &= 0 \\
+\sigma^2 &= \frac{1}{n}\Sigma^n_{i=1}(x_i - \mu)^2.
+\end{align}
+
+These results for the MLE's are indeed the sample mean and variance (except with the divisor of $n$ instead of $n-1$).
+
+## Problem \#2
+
+Double Exponential Distributions. Slides 10-12 of LS7 show the following for the case of i.i.d. data with a double exponential distribution: For an odd sample size the sample median is the MLE of the mean.
+
+a. Show that for even sample sizes (with no data ties) the MLE is not unique and can have a finite range of values. Describe that range of values in terms of the ordered data.
+
+Our distribution is: $f_{DE}(x_i;\mu,s) = \Pi^n_{i=1}\frac{1}{2s}e^{-\frac{|x_i - \mu|}{s}} = (\frac{1}{2s})^n\Pi^n_{i=1}e^{-\frac{1}{s}\Sigma^n_{i=1}|x_i - \mu|}$.
+
+Slide 10 shows that the log-likelihood is:
+
+$l(\mu) = \log\left(\frac{1}{(2s)^n}\right) - \Sigma^n_{i=1}\frac{|x_i - \mu|}{s}$; slide 11 shows that the derivative of this function (wrt $\mu$) is:
+
+$l'(\mu) = -\frac{1}{s}\Sigma^n_{i=1}\frac{d}{d\mu}|x_i - \mu|$.
+
+Slide 12 writes the solution to this as:
+
+$\Sigma^n_{i=1}SGN(x_i - \mu) = 0$.
+
+For an odd sample size, the sum of the signs of the $x_i - \mu$ will be zero only if we set $\mu$ to the middle data point $x_{(n+1)/2}$.
+
+But consider a sample of even size: $x_{(1)},...,x_{(\frac{n}{2})},x_{(\frac{n}{2}+1)},...,x_{(n)}$. Here, our sum of the signs of the $x_i - \mu$ will be zero _as long as we choose a $\mu$ between_ $x_{(\frac{n}{2})}$ _and_ $x_{(\frac{n}{2}+1)}$. There is thus a continuum of solutions here (since we know that there are no ties among the data points).
+
+Thus we shall have $\mu \in (x_{(\frac{n}{2})},x_{(\frac{n}{2}+1)})$.
+
+b. Derive the joint MLE for the mean $\mu$ and scale parameter $s$.
+
+We have:
+
+$l(\mu,s) = \log\left(\frac{1}{(2s)^n}\right) - \Sigma^n_{i=1}\frac{|x_i - \mu|}{s}$
+
+For the MLE of $\mu$ we have:
+
+$\frac{\partial l}{\partial\mu} = -\frac{1}{s}\Sigma^n_{i=1}SGN(x_i - \mu)$.
+
+Setting this to zero, we find, as per (a):
+
+For odd $n$, $\mu = x_{(n+1)/2}$; for even $n$, $\mu \in (x_{(\frac{n}{2})},x_{(\frac{n}{2}+1)})$.
+
+For the MLE of $s$ we have:
+
+$l(\mu,s) = \log\left(\frac{1}{(2s)^n}\right) - \Sigma^n_{i=1}\frac{|x_i - \mu|}{s} = -n\log(2s) - \frac{1}{s}\Sigma^n_{i=1}|x_i - \mu|$.
+
+Thus:
+
+\begin{align}
+\frac{\partial l}{\partial s} = -\frac{n}{s} + \frac{\Sigma^n_{i=1}|x_i - \mu|}{s^2} &= 0 \\
+-\frac{ns}{s^2} + \frac{\Sigma^n_{i=1}|x_i - \mu|}{s^2} &= 0 \\
+s &= \frac{\Sigma^n_{i=1}|x_i - \mu|}{n}.
+\end{align}
+
+## Problem \#3
+
+Fisher Information and Asymptotic Variance.
+
+a. Confirm the formula for the Fisher information in Example 1 on slide 23 of LS7.
+
+For this example we have $\theta = \mu$ and $f_1(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_1 - \mu)^2}{2\sigma^2}}$.
+
+Thus the Fisher Information is:
+
+\begin{align}
+I(\mu) &= E\left[\left(\frac{\partial}{\partial\mu}\left[\log\left(\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_1 - \mu)^2}{2\sigma^2}}\right)\right]\right)^2\right] \\
+&= E\left[\left(0 - \frac{\partial}{\partial\mu}\left[\frac{(x_1 - \mu)^2}{2\sigma^2}\right]\right)^2\right] \\
+&= E\left[\left(\frac{\partial}{\partial\mu}\left[\frac{-1}{2\sigma^2}(x_1 - \mu)^2\right]\right)^2\right] \\
+&= E\left[\left(\frac{1}{\sigma^2}(x_1 - \mu)\right)^2\right] \\
+&= \frac{1}{\sigma^4}E[(x_1 - \mu)^2] \\
+&= \frac{1}{\sigma^4}\sigma^2 \\
+&= \frac{1}{\sigma^2}.
+\end{align}
+
+b. Derive the formula for the Fisher information in Example 2 on slide 23 of LS7.
+
+For this example we have $\theta = \mu$ and $f_1(x) = \frac{1}{2s}e^{-\frac{|x_1 - \mu|}{s}}$.
+
+Thus the Fisher Information is:
+
+\begin{align}
+I(\mu) &= E\left[\left(\frac{\partial}{\partial\mu}\left[\log\left(\frac{1}{2s}e^{-\frac{|x_i - \mu|}{s}}\right)\right]\right)^2\right] \\
+&= E\left[\left(0 -\frac{1}{s}\frac{\partial}{\partial\mu}|x_1 - \mu|\right)^2\right] \\
+&= E\left[\left(\frac{1}{s}SGN(x_1 - \mu)\right)^2\right] \\
+&= \frac{1}{s^2}E[SGN(x_1 - \mu)^2] \\
+&= \frac{1}{s^2}.
+\end{align}
+
+c. By virtue of being an MLE the sample median is an asymptotically optimal estimator of
+the mean for a double exponential distribution $f_{DE}(x;\mu,s)$. The sample mean is not
+optimal in this case, and therefore has a larger asymptotic variance than the sample median. What is the formula for the efficiency of the sample mean in this case?
+
+The formula for the efficiency of an estimator is:
+
+$EFF(\theta) = \frac{Var(\theta_{MLE})}{Var(\theta)}$, where $Var(\theta)$ is the multiplicative inverse of $\theta$'s Fisher Information.
+
+Thus
+
+\begin{align}
+EFF(\bar{x}) &= \frac{Var(MED(x))}{Var(\bar{x})} \\
+&= \frac{I(\bar{x})}{I(MED(x))} \\
+&= s^2*I(\bar{x}) \\
+&= s^2\left(\frac{\partial}{\partial\bar{x}}\left[\log\left(\frac{1}{2s}e^{-\frac{|x_1 - \mu|}{s}}\right)\right]\right)^2 \\
+&= \left(s\frac{\partial}{\partial\bar{x}}\left[\log\left(\frac{1}{2s}\right) - \frac{|x_1 - \mu|}{s}\right]\right)^2.
+\end{align}

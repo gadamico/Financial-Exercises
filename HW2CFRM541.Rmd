@@ -1,0 +1,226 @@
+---
+title: "CFRM 541 Homework 2"
+author: "Greg Damico"
+date: "October 21, 2016"
+output: pdf_document
+---
+
+## Problem \#1
+
+Consider the transformation $Y = X^2$ where the random variable X has distribution function \newline
+$F_X(x) = P(X \leq x)$ and density function $f_X(x) = F'_X(x)$.
+
+a. Express the distribution function $F_Y(y) = P(Y \leq y)$ in terms of $F_X$.
+
+Very roughly we have $F_Y(y) = P(Y \leq y) = P(X^2 \leq y) = P(X \leq \sqrt{y}) = F_X(\sqrt{y})$.
+
+But there is a slight difficulty with this reasoning, since $X^2$ is not, of course, a monotonic function.  But it is monotonic (decreasing) on the interval $(-\infty, 0)$ and monotonic (increasing) on the interval $(0, \infty)$.
+
+Now the probability that $X^2 \leq y$ is the probability that BOTH $X \leq \sqrt{y}$ AND $X \geq -\sqrt{y}$.
+
+That is, $P(X^2 \leq y) = P(X \leq \sqrt{y}) - P(X < -\sqrt{y})$.
+
+So we have:
+
+$$
+F_Y(y) = \left\{
+\begin{array}{ll}
+0, \quad y \leq 0 \\
+F_X(\sqrt{y}) - F_X(-\sqrt{y}), \quad y > 0 \\
+\end{array}
+\right.
+$$
+
+b. Derive the density function $f_Y(y)$ from $F_Y(y)$.
+
+$f_Y(y) = F_Y'(y)$.  Thus we have:
+
+$$
+f_Y(y) = \left\{
+\begin{array}{ll}
+0, \quad y \leq 0 \\
+\frac{1}{2\sqrt{y}} (f_X(\sqrt{y}) + f_X(-\sqrt{y})), \quad y > 0 \\
+\end{array}
+\right.
+$$
+
+c. Write down the formula for $f_Y(y)$ in the case where $f_X(x)$ is a standard normal
+density.  Confirm that the result is a special case of a chi-squared density.
+
+Suppose $f_X(x)$ is a standard normal density.  Then $f_X(x) = \frac{1}{\sqrt{2\pi}} e^{\frac{-x^2}{2}}$.
+
+Thus:
+
+$$
+f_Y(y) = \left\{
+\begin{array}{ll}
+0, \quad y \leq 0 \\
+\frac{1}{2\sqrt{y}} (\frac{1}{\sqrt{2\pi}}e^{\frac{-y}{2}} + \frac{1}{\sqrt{2\pi}}e^{\frac{-y}{2}}), \quad y > 0 \\
+\end{array}
+\right.
+$$
+
+Simplifying:
+
+$$
+f_Y(y) = \left\{
+\begin{array}{ll}
+0, \quad y \leq 0 \\
+\frac{e^{\frac{-y}{2}}}{\sqrt{2\pi y}}, \quad y > 0 \\
+\end{array}
+\right.
+$$
+
+Now the chi-squared density has the form:
+
+$$
+f_{\chi^2}(y, k) = \left\{
+\begin{array}{ll}
+0, \quad y \leq 0 \\
+\frac{y^{\frac{k}{2} - 1}e^{\frac{-y}{2}}}{2^{\frac{k}{2}}\Gamma(\frac{k}{2})}, \quad y > 0 \\
+\end{array}
+\right.
+$$
+
+where $k$ is the number of degrees of freedom.  In our case $k = 1$.
+
+Hence:
+
+$$
+f_{\chi^2}(y) = \left\{
+\begin{array}{ll}
+0, \quad y \leq 0 \\
+\frac{y^{\frac{1}{2} - 1}e^{\frac{-y}{2}}}{2^{\frac{1}{2}}\Gamma(\frac{1}{2})}, \quad y > 0 \\
+\end{array}
+\right.
+$$
+
+Now $\Gamma(\frac{1}{2}) = \sqrt{\pi}$.  So, simplifying:
+
+$$
+f_{\chi^2}(y) = \left\{
+\begin{array}{ll}
+0, \quad y \leq 0 \\
+\frac{e^{\frac{-y}{2}}}{\sqrt{2\pi y}}, \quad y > 0 \\
+\end{array}
+\right.
+$$
+
+
+This is the same as our expression for $f_Y(y)$ above when $f_X(x)$ is a standard normal density.
+
+
+## Problem \#2
+
+Do the following with respect to certain utility functions:
+
+a. Show that log utility is a special case of power utility as $\gamma \to 0$.
+
+A power utility is described by:
+
+$U_p(w) = \frac{w^{\gamma} - 1}{\gamma}$, for $\gamma < 1$ and $\gamma \neq 0$.
+
+We need to show that $\lim_{\gamma \to 0} U_p(w) = \log(w)$.
+
+If we plug in 0 for $\gamma$ in the above formula for a power utility, we get:
+
+$U_p(w) = \frac{w^0 - 1}{0} = \frac{0}{0}$.
+
+We can use L'Hôpital's Rule to evaluate our limit.  This rule tells us that if we replace numerator and denominator with their derivatives wrt $\gamma$ and then calculate this new fraction's value in the limit as $\gamma \to 0$, we'll get the same result.  Thus we have:
+
+\begin{align}
+\lim_{\gamma \to 0} U_p(w) &= \lim_{\gamma \to 0} \frac{w^{\gamma} - 1}{\gamma} \\
+&= \lim_{\gamma \to 0} \frac{w^{\gamma}(\log(w))}{1} \\
+&= \log(w).
+\end{align}
+
+b. Derive the expressions for $ara(w)$ and $rra(w)$ for quadratic utility and show that
+both are increasing functions of wealth.
+
+$ara(w) = \frac{-U''(w)}{U'(w)}$.
+
+Thus for quadratic utility we have:
+
+$U_q(w) = aw - bw^2; a,b > 0$ and
+
+$ara(w) = \frac{2b}{a - 2bw}$.  We can show that ara(w) is increasing by showing that $\frac{d}{dw} [ara(w)] > 0$ for all w.  Now $ara(w) = (2b)(a - 2bw)^{-1}$, so
+
+\begin{align}
+\frac{d}{dw} [ara(w)] &= (-2b)(a - 2bw)^{-2}(-2b) \\
+&= \frac{4b^2}{(a - 2bw)^2} \\
+&> 0.
+\end{align}
+
+$rra(w) = \frac{-wU''(w)}{U'(w)}$.
+
+Thus for quadratic utility we have:
+
+$U_q(w) = aw - bw^2; a,b > 0$ and
+
+$rra(w) = \frac{2bw}{a - 2bw}$.  Again we consider the derivative:
+
+\begin{align}
+\frac{d}{dw} [rra(w)] &= \frac{(a - 2bw)(2b) - (2bw)(-2b)}{(a - 2bw)^2} \\
+&= \frac{2ab}{(a - 2bw)^2} \\
+&> 0.
+\end{align}
+
+Thus ara(w) and rra(w) are increasing functions of w.
+
+
+c. Derive the expressions for $ara(w)$ and $rra(w)$ for power utility, thereby making it
+obvious that the first is decreasing in wealth and the second is constant.
+
+Again, $ara(w) = \frac{-U''(w)}{U'(w)}$.
+
+Thus for power utility we have:
+
+$U_p(w) = \frac{w^{\gamma} - 1}{\gamma}$, for $\gamma < 1$ and $\gamma \neq 0$ and
+
+$ara(w) = \frac{-(\gamma - 1)w^{\gamma - 2}}{w^{\gamma - 1}} = \frac{-(\gamma - 1)}{w}$.
+
+Now $\frac{d}{dw} [ara(w)] = \frac{\gamma - 1}{w^2}$.  And since $\gamma < 1$, $\frac{d}{dw} [ara(w)] < 0$, which is to say that ara(w) is a decreasing function of w.
+
+$rra(w) = \frac{-wU''(w)}{U'(w)}$.
+
+Thus:
+
+$rra(w) = \frac{-(\gamma - 1)w^{\gamma - 1}}{w^{\gamma - 1}} = -(\gamma - 1)$.
+
+Clearly $\frac{d}{dw} [rra(w)] = 0$.  Hence rra(w) is a constant function.
+
+
+## Problem \#3
+
+Show that if two utility functions $U_1$ and $U_2$ are equivalent by virtue of $U_2 = aU_1 + b, a > 0$, then they both have the same absolute and relative risk aversions.
+
+Suppose $U_2 = aU_1 + b$ for some a > 0.
+
+Then $U_2' = aU_1'$ and $U_2'' = aU_1''$.
+
+Then $ara_{U_2}(w) = \frac{-aU_1''}{aU_1'} = \frac{-U_1''}{U_1'} = ara_{U_1}(w)$.
+
+Similarly, $rra_{U_2}(w) = \frac{-awU_1''}{aU_1'} = \frac{-wU_1''}{U_1'} = rra_{U_1}(w)$.
+
+
+## Problem \#4
+
+Carry out the details of the suggested solution method on slide 19 of LS2 to show that $\pi = \frac{\sigma^2}{2} ara(W_0)$.
+
+Slide 19 tells us that $U(W) = E[U(W_0 + H)]$.
+
+We shall expand the LHS to first-order accuracy and the RHS to second-order accuracy.
+
+We have:
+
+\begin{align}
+U(W) &= E[U(W_0 + H)] \\
+U(W_0) + U'(W_0)(W - W_0) &= E[U(W_0) + U'(W_0)(H) + \frac{1}{2}U''(W_0)H^2] \\
+&= E[U(W_0)] + E[U'(W_0)]E[H] + E[\frac{1}{2}U''(W_0)H^2] \\
+&= U(W_0) + 0 + \frac{1}{2}U''(W_0)\sigma^2 \\
+U'(W_0)(W - W_0) &= \frac{1}{2}U''(W_0)\sigma^2 \\
+-\pi U'(W_0) &= \frac{1}{2}U''(W_0)\sigma^2
+\end{align}
+
+Hence $\pi = -\frac{U''(W_0)\sigma^2}{2U'(W_0)} = \frac{\sigma^2}{2} ara(W_0)$.
+

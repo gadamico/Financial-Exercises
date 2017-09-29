@@ -1,0 +1,185 @@
+---
+title: "CFRM 541 Homework 6"
+author: "Greg Damico"
+date: "November 21, 2016"
+output: pdf_document
+---
+
+## Problem \#1
+
+Verify that solution of the estimating equations (8.6) and (8.7) gives the LS estimators (8.8) and (8.9).
+
+Equations (8.6) and (8.7) are:
+
+(8.6) $\Sigma^T_{t=1}(r_t - \alpha - \beta r_{f,t}) = 0$
+
+(8.7) $\Sigma^T_{t=1}r_{f,t}(r_t - \alpha - \beta r_{f,t}) = 0$.
+
+(8.8) and (8.9) are expressions for $\alpha$ and $\beta$ deducible from (8.6) and (8.7):
+
+(8.8) $\beta = \frac{\Sigma^T_{t=1}(r_t - \bar{r})(r_{f,t} - \bar{r}_f)}{\Sigma^T_{t=1}(r_{f,t} - \bar{r}_f)^2}$.
+
+(8.9) $\alpha = \bar{r} - \beta\bar{r}_f$.
+
+Since (8.9) expresses $\alpha$ in terms of $\beta$, let us begin by solving (8.6) for $\alpha$:
+
+\begin{align}
+\Sigma^T_{t=1}(r_t - \alpha - \beta r_{f,t}) &= 0 \\
+\Sigma^T_{t=1}(r_t - \beta r_{f,t}) - T\alpha &= 0 \\
+T\alpha &= \Sigma^T_{t=1}(r_t - \beta r_{f,t}) \\
+\alpha &= \frac{\Sigma^T_{t=1}(r_t - \beta r_{f,t})}{T} \\
+&= \frac{\Sigma^T_{t=1}r_t}{T} - \frac{\Sigma^T_{t=1}\beta r_{f,t}}{T} \\
+&= \bar{r} - \beta \bar{r}_f.
+\end{align}
+
+To find an expression for $\beta$, we first multiply (8.6) by $\bar{r}_f$, and then subtract the result from (8.7):
+
+\begin{align}
+\bar{r}_f\Sigma^T_{t=1}(r_t - \alpha - \beta r_{f,t}) &= 0 \\
+\Sigma^T_{t=1}\bar{r}_f(r_t - \alpha - \beta r_{f,t}) &= 0
+\end{align}
+
+Now:
+
+\begin{align}
+\Sigma^T_{t=1}r_{f,t}(r_t - \alpha - \beta r_{f,t}) - \Sigma^T_{t=1}\bar{r}_f(r_t - \alpha - \beta r_{f,t}) &= 0 - 0 = 0 \\
+\Sigma^T_{t=1}(r_{f,t} - \bar{r}_f)(r_t - \alpha - \beta r_{f,t}) &= 0.
+\end{align}
+
+Now we plug in our result for $\alpha$:
+
+\begin{align}
+\Sigma^T_{t=1}(r_{f,t} - \bar{r}_f)(r_t - (\bar{r} - \beta \bar{r}_f) - \beta r_{f,t}) &= 0 \\
+\Sigma^T_{t=1}(r_{f,t} - \bar{r}_f)(r_t - \bar{r}) &= \beta \cdot \Sigma^T_{t=1}(r_{f,t} - \bar{r}_f)(r_{f,t} - \bar{r}_f) \\
+\beta &= \frac{\Sigma^T_{t=1}(r_{f,t} - \bar{r}_f)(r_t - \bar{r})}{\Sigma^T_{t=1}(r_{f,t} - \bar{r}_f)^2} \\
+&= \frac{\Sigma^T_{t=1}(r_t - \bar{r})(r_{f,t} - \bar{r}_f)}{\Sigma^T_{t=1}(r_{f,t} - \bar{r}_f)^2}
+\end{align}
+
+## Problem \#2
+
+Write down the mathematical form of an up and down market factor model with error term.
+
+A single-factor up model would look like:
+
+$r_{i,t} - r_{f,t} = \alpha_{up} + \beta_{up}(r_{M,t} - r_{f,t}) + \epsilon_{up}$.
+
+(And a single-factor down model would look similar.) What we want is to have a model that
+makes use of $\alpha_{up}$ and $\beta_{up}$ when the market is up, but that makes use of
+$\alpha_{dn}$ and $\beta_{dn}$ when the market is down.
+
+It won't do to write: $r_{i,t} - r_{f,t} = \alpha_{up} + \beta_{up}(r_{M,t} - r_{f,t}) + \epsilon_{up} + \alpha_{dn} + \beta_{dn}(r_{M,t} - r_{f,t}) + \epsilon_{dn}$, since this
+would improperly use all four parameters regardless of the state of the market. However, we
+can "silence" the relevant addend by making use of the indicator function $I(x)$, where
+
+$$
+I(x) = \left\{
+\begin{array}{ll}
+0, \quad x < 0 \\
+1, \quad x \geq 0 \\
+\end{array}
+\right.
+$$
+
+We write:
+
+$r_{i,t} - r_{f,t} = I(r_{M,t} - r_{f,t})(\alpha_{up} + \beta_{up}(r_{M,t} - r_{f,t})) + I(r_{f,t} - r_{M,t})(\alpha_{dn} + \beta_{dn}(r_{M,t} - r_{f,t})) + \epsilon_{t}$.
+
+## Problem \#3
+
+Use the 'plot' function with the optional argument 'SFM.line=T' on the results of using
+'fitTsfm' to fit up and down market fits for the hedge fund managers HAM1, HAM2, HAM3,
+HAM4, HAM5, HAM6. Report your results for the manager whose up and down market betas in
+your judgment differ the most from the usual LS straight line fit.
+
+```{r}
+library(mpo)
+library(robust)
+library(factorAnalytics)
+
+# Returns of the following: 6 hedge fund managers returns,
+# a long-short equity hedge fund style index, sp500, long-term
+# U.S. treasury 10 year bond, 3 month U.S treasury bill
+data(managers)
+names(managers)
+
+# Renaming last four with somewhat shorter names
+names(managers)[7:10] = c("LS.EQ.HF","SP500","US.10Y","UW.3M")
+names(managers)
+
+# Select asset returns and fit up and down betas for each of HAM 1-6
+for (j in 1:6){
+asset = colnames(managers[,j])
+fitUpDn <- fitTsfmUpDn(asset,mkt.name="SP500",data=managers)
+plot(fitUpDn, SFM.line = T)
+summary(fitUpDn)
+}
+
+```
+
+The sixth HAM seems to have up- and down-betas differing the most from the LS line.
+
+## Problem \#4
+
+It is natural to conjecture that if we searched over all four single factor models with
+each of the hedge fund style indices in turn, we would probably have ended up with CST.EM
+being the best choice of a single factor. Confirm whether or not this is true by fitting
+single factor models using each of the hedge fund style indexes separately.
+
+```{r}
+names(JMfmmcData)
+plot.zoo(JMfmmcData[,1:5],xlab="",ylab = names(JMfmmcData[,1:5]))
+plot.zoo(JMfmmcData[,6:9],xlab="",ylab = names(JMfmmcData[,6:9]))
+
+# Fit EM hedge fund returns returns to each index (columns 6-9)
+retHF = JMfmmcData
+for (j in 6:9){
+fac.names = names(retHF)[j]
+fit.1fac = fitTsfm("EM",fac.names,data = retHF)
+fitTsfmStats(fit.1fac,rsq = T)
+}
+
+```
+
+Because the fit to the CST.EM model has the highest $R^2$-term of the four models, this
+does indeed seem to be the best choice of a single factor.
+
+## Problem \#5
+
+Make LS fits of the EM hedge fund returns using the four hedge fund style indices for the
+entire EM returns series. Then do likewise for each of the following two time periods
+representing visually distinct regimes: 1996 through 2001, and 2002 through 2006. What do
+you conclude about the differences, if any, between your four factor model fits for each of
+those two regimes, and the differences between the results for each of the two regimes
+relative to the results for the entire returns history?
+
+```{r}
+# Time periods
+RETHFearly = window(retHF, start = "1996-08-31", end = "2001-12-31")
+RETHFlate = window(retHF, start = "2002-01-31", end = "2006-08-31")
+
+# LS fit of EM hedge fund returns to all 4 style indexes
+fac.names = names(retHF)[6:9]
+fit.4fac = fitTsfm("EM",fac.names,data = retHF)
+fitTsfmStats(fit.4fac,rsq = T)
+
+# LS fit of EM hedge fund early period returns to all 4 style indexes
+fac.names = names(retHF)[6:9]
+fit.4fac = fitTsfm("EM",fac.names,data = RETHFearly)
+fitTsfmStats(fit.4fac,rsq = T)
+
+# LS fit of EM hedge fund late period returns to all 4 style indexes
+fac.names = names(retHF)[6:9]
+fit.4fac = fitTsfm("EM",fac.names,data = RETHFlate)
+fitTsfmStats(fit.4fac,rsq = T)
+
+```
+
+The late-period return yields the higher $R^2$ value, so this seems to be the better fit.
+
+The $R^2$ value for the whole period is slightly larger than the $R^2$ value for the early
+period (since the fit for the later period is significantly better). In all three tests it
+is only the CST.EM model that has a statistically (very) significant value, which is hardly
+surprising.
+
+
+
